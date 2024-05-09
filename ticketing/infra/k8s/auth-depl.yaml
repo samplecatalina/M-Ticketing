@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: auth
-          image: rallycoding/auth
+          image: us.gcr.io/m-ticketing-422807/auth
 ---
 apiVersion: v1
 kind: Service
