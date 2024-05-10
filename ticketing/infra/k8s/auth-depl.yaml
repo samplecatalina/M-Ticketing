@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: auth
-          image: us.gcr.io/m-ticketing-422807/auth
+          image: samplecatalina/auth
 ---
 apiVersion: v1
 kind: Service
