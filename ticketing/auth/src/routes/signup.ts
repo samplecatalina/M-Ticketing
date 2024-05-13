@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post(
   "/api/users/signup",
-  [
+  [ // use a square bracket to define an array of middleware: here is express-validator
     body("email").isEmail().withMessage("Email must be valid"),
     body("password")
       .trim()
