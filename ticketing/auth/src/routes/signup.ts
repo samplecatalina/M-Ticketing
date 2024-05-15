@@ -1,30 +1,51 @@
-import express, { Request, Response } from "express";
-import { body, validationResult } from "express-validator";
+import express, { Request, Response } from 'express';
+import { body } from 'express-validator';
+import jwt from 'jsonwebtoken';
+import { validateRequest, BadRequestError } from '@rallycoding/common';
+
+import { User } from '../models/user';
 
 const router = express.Router();
 
 router.post(
-  "/api/users/signup",
-  [ // use a square bracket to define an array of middleware: here is express-validator
-    body("email").isEmail().withMessage("Email must be valid"),
-    body("password")
+  '/api/users/signup',
+  [
+    body('email')
+      .isEmail()
+      .withMessage('Email must be valid'),
+    body('password')
       .trim()
       .isLength({ min: 4, max: 20 })
-      .withMessage("Password must be between 4 and 20 characters"),
+      .withMessage('Password must be between 4 and 20 characters')
   ],
-  (req: Request, res: Response) => {
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-      return res.status(400).send(errors.array());
-    }
+  validateRequest,
+  async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
-    console.log("Creating a user...");
+    const existingUser = await User.findOne({ email });
 
-    res.send({});
+    if (existingUser) {
+      throw new BadRequestError('Email in use');
+    }
 
-    // new User({ email, password })
+    const user = User.build({ email, password });
+    await user.save();
+
+    // Generate JWT
+    const userJwt = jwt.sign(
+      {
+        id: user.id,
+        email: user.email
+      },
+      process.env.JWT_KEY!
+    );
+
+    // Store it on session object
+    req.session = {
+      jwt: userJwt
+    };
+
+    res.status(201).send(user);
   }
 );
 
