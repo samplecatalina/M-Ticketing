@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: expiration
-          image: rallycoding/expiration
+          image: samplecatalina/expiration
           env:
             - name: NATS_CLIENT_ID
               valueFrom:
@@ -26,3 +26,34 @@ spec:
               value: ticketing
             - name: REDIS_HOST
               value: expiration-redis-srv
+          resources:
+            limits:
+              cpu: "0.5"
+              memory: "512Mi"
+            requests:
+              cpu: "0.1"
+              memory: "128Mi"
+
+        - name: expiration
+          image: samplecatalina/expiration
+          ports:
+          - containerPort: 3000
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3000
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          resources:
+            limits:
+              cpu: "0.5"
+              memory: "512Mi"
+            requests:
+              cpu: "0.1"
+              memory: "128Mi"

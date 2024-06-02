@@ -14,7 +14,38 @@ spec:
     spec:
       containers:
         - name: client
-          image: rallycoding/ticketing-client
+          image: samplecatalina/ticketing-client
+          resources:
+            limits:
+              cpu: "0.5"
+              memory: "512Mi"
+            requests:
+              cpu: "0.1"
+              memory: "128Mi"
+
+        - name: auth
+          image: samplecatalina/ticketing-client
+          ports:
+          - containerPort: 3000
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3000
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          resources:
+            limits:
+              cpu: "0.5"
+              memory: "512Mi"
+            requests:
+              cpu: "0.1"
+              memory: "128Mi"
 ---
 apiVersion: v1
 kind: Service

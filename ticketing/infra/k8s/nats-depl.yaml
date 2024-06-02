@@ -31,6 +31,29 @@ spec:
               '-cid',
               'ticketing',
             ]
+        - name: nats
+          image: nats-streaming:0.17.0
+          ports:
+          - containerPort: 3000
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3000
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          resources:
+            limits:
+              cpu: "0.5"
+              memory: "512Mi"
+            requests:
+              cpu: "0.1"
+              memory: "128Mi"
 ---
 apiVersion: v1
 kind: Service
